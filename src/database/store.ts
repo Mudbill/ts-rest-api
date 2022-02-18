@@ -8,3 +8,7 @@ export const db = Datastore.create({
 export function findUser(username: string, password: string) {
   return db.findOne({ username, password });
 }
+
+export function createUser(username: string, password: string) {
+  return db.insert({ username, password });
+}

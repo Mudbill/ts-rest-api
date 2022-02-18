@@ -1,13 +1,5 @@
-import {
-  ErrorRequestHandler,
-  RequestHandler,
-  NextFunction,
-  Request,
-  Response,
-} from "express";
-import { ParamsDictionary, Query } from "express-serve-static-core";
-import { validationResult } from "express-validator";
-import { APIError, ValidationError } from "./types";
+import { ErrorRequestHandler, RequestHandler } from "express";
+import { APIError } from "./types";
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (err instanceof APIError) {
@@ -28,26 +20,5 @@ export const defaultRouteHandler: RequestHandler = (req, res, next) => {
     message: "The requested resource was not found.",
   });
 };
-
-export const validateBody: RequestHandler = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const [error] = errors.array();
-    throw new ValidationError(400, `${error.msg} '${error.param}'`);
-  }
-  next();
-};
-
-export function asyncWrapper(
-  cb: (
-    req: Request<ParamsDictionary, any, any, Query, Record<string, any>>,
-    res: Response<any, Record<string, any>>,
-    next: NextFunction
-  ) => Promise<void>
-): RequestHandler {
-  return (req, res, next) => {
-    cb(req, res, next).catch(next);
-  };
-}
 
 export default errorHandler;

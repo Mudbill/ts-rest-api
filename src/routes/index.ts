@@ -1,34 +1,19 @@
 import { Router } from "express";
-import { authenticate } from "../db";
-import { AuthorizationError } from "../errors/types";
+import { authorizationHandler } from "../middleware";
 import invoices from "./invoices";
 import login from "./login";
+import users from "./users";
 
 const router = Router();
 
-// Allowed anonymous routes
-
+// Public routes
 router.use("/login", login);
+router.use("/users", users);
 
 // Authenticate all other requests
-
-router.all("*", (req, res, next) => {
-  const token = req.headers["x-api-token"];
-
-  if (!token) {
-    throw new AuthorizationError(400, "Missing token");
-  }
-
-  const auth = authenticate(token.toString());
-  if (!auth) {
-    throw new AuthorizationError(403, "Invalid token");
-  }
-
-  next();
-});
+router.all("*", authorizationHandler);
 
 // Private routes requiring valid token
-
 router.use("/invoices", invoices);
 
 export default router;

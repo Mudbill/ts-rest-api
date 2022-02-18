@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { login } from "../../database";
-import { ValidationError } from "../../errors/types";
+import { createUser } from "../../database/store";
+import { APIError } from "../../errors/types";
 import { asyncWrapper, validateBody } from "../../middleware";
 
 const router = Router();
@@ -13,12 +13,10 @@ router.post(
   validateBody,
   asyncWrapper(async (req, res) => {
     const { username, password } = req.body;
-    const token = await login(username, password);
-    if (!token) throw new ValidationError(400, "Invalid credentials");
-    res.send({
-      payload: {
-        token,
-      },
+    const user = await createUser(username, password);
+    if (!user) throw new APIError(500, "Unknown error");
+    res.status(201).send({
+      payload: { user },
     });
   })
 );
