@@ -50,11 +50,11 @@ export async function findUser(username: string, password: string) {
  * @throws Error if username already exists
  */
 export async function createUser(username: string, password: string) {
-  if (await db.findOne({ username })) {
+  if (await db.findOne({ type: "user", "data.username": username })) {
     throw new Error("Username is already in use");
   }
 
-  const salt = hash(username);
+  const salt = hash(new Date().toISOString());
   const hashedPassword = hash(`${salt}.${password}`);
 
   return await db.insert<User>({
