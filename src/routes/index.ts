@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authorizationHandler } from "../middleware";
-import invoices from "./invoices";
+import products from "./products";
 import login from "./login";
 import users from "./users";
 
@@ -14,6 +14,6 @@ router.use("/users", users);
 router.all("*", authorizationHandler);
 
 // Private routes requiring valid token
-router.use("/invoices", invoices);
+router.use("/products", products);
 
 export default router;

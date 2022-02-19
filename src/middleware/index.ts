@@ -1,7 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ParamsDictionary, Query } from "express-serve-static-core";
 import { validationResult } from "express-validator";
-import { authenticate } from "../database";
+import { authenticate } from "../database/auth";
 import { AuthorizationError, ValidationError } from "../errors/types";
 
 type DefaultRequest = Request<
@@ -21,17 +21,19 @@ type AsyncRequestHandler = (callback: Callback) => RequestHandler;
 
 /**
  * This middleware handler ensures all handlers after it are authorized
- * with a valid JWT provided in the x-api-token header.
+ * with a valid JWT provided in Authorization: Bearer <token>
  * @param req request
  * @param res response
  * @param next next handler
  */
 export const authorizationHandler: RequestHandler = (req, res, next) => {
-  let token = req.headers["x-api-token"];
-  if (Array.isArray(token)) token = token[0];
+  const token = req.headers.authorization?.split("Bearer ")[1];
 
   if (!token) {
-    throw new AuthorizationError(400, "Missing token");
+    throw new AuthorizationError(
+      400,
+      "Missing bearer token in 'Authorization' header"
+    );
   }
 
   const auth = authenticate(token);

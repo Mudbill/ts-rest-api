@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { createUser } from "../../database/store";
-import { APIError } from "../../errors/types";
+import { createUser, User } from "../../database/models/user";
+import { ValidationError } from "../../errors/types";
 import { asyncWrapper, validateBody } from "../../middleware";
 
 const router = Router();
@@ -13,8 +13,14 @@ router.post(
   validateBody,
   asyncWrapper(async (req, res) => {
     const { username, password } = req.body;
-    const user = await createUser(username, password);
-    if (!user) throw new APIError(500, "Unknown error");
+    let user: User;
+
+    try {
+      user = await createUser(username, password);
+    } catch (err) {
+      throw new ValidationError(400, "User already exists");
+    }
+
     res.status(201).send({
       payload: { user },
     });

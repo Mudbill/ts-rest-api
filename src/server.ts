@@ -1,6 +1,6 @@
 import "dotenv/config";
 import express from "express";
-import routes from "./routes/index";
+import routes from "./routes";
 import errorHandler, { defaultRouteHandler } from "./errors/handlers";
 
 const app = express();

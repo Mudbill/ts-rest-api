@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { login } from "../../database";
+import { login } from "../../database/auth";
 import { ValidationError } from "../../errors/types";
 import { asyncWrapper, validateBody } from "../../middleware";
 
